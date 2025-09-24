@@ -105,6 +105,32 @@ const Education = () => {
                       <p className="cert-issuer-large">
                         {certifications[selectedBook].issuer}
                       </p>
+                      {/* Education navigation indicator */}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: "8px",
+                          marginTop: "40px",
+                          paddingBottom: "20px",
+                        }}
+                      >
+                        {certifications.map((_, index) => (
+                          <div
+                            key={index}
+                            style={{
+                              width: "8px",
+                              height: "8px",
+                              borderRadius: "50%",
+                              backgroundColor:
+                                index === selectedBook
+                                  ? "rgb(237, 80, 118)"
+                                  : "#555",
+                              transition: "background-color 0.3s ease",
+                            }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ) : (
