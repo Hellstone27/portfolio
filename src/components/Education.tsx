@@ -1,9 +1,35 @@
-import { BookOpen } from "lucide-react";
-import { useState } from "react";
+import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import { education, certifications } from "../constants/portfolioData";
 
 const Education = () => {
   const [selectedBook, setSelectedBook] = useState<number | null>(0); // Default to button 1 (index 0)
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  const nextCertificate = () => {
+    setSelectedBook((prev) =>
+      prev === null || prev === certifications.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevCertificate = () => {
+    setSelectedBook((prev) =>
+      prev === null || prev === 0 ? certifications.length - 1 : prev - 1
+    );
+  };
 
   return (
     <section
@@ -18,7 +44,9 @@ const Education = () => {
         backgroundPosition: "center, center",
         backgroundRepeat: "no-repeat, no-repeat",
         backgroundAttachment: "fixed, fixed",
-        clipPath: `polygon(
+        clipPath: isMobile
+          ? "none"
+          : `polygon(
           0% 8%, 
           6% 8%, 6% 4%, 
           11% 4%, 11% 9%, 
@@ -39,8 +67,8 @@ const Education = () => {
           100% 3%, 100% 100%, 
           0% 100%
         )`,
-        marginTop: "-100px",
-        paddingTop: "150px",
+        marginTop: isMobile ? "0" : "-100px",
+        paddingTop: isMobile ? "4rem" : "150px",
         position: "relative",
         zIndex: 10,
         color: "#fff",
@@ -82,68 +110,72 @@ const Education = () => {
               </div>
             </div>
 
-            {/* Bottom Half - Selected Certificate Details */}
-            <div className="certificate-display-section">
-              <div className="certificate-display">
-                {selectedBook !== null ? (
-                  <div className="selected-certificate">
-                    <div className="cert-header">
-                      <BookOpen
-                        size={24}
-                        style={{ color: "rgb(237, 80, 118)" }}
-                      />
-                      <h4>
-                        {certifications[selectedBook].type === "certification"
-                          ? "Certification Details"
-                          : "Course Details"}
-                      </h4>
-                    </div>
-                    <div className="cert-details">
-                      <h5 className="cert-title-large">
-                        {certifications[selectedBook].title}
-                      </h5>
-                      <p className="cert-issuer-large">
-                        {certifications[selectedBook].issuer}
-                      </p>
-                      {/* Education navigation indicator */}
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          gap: "8px",
-                          marginTop: "40px",
-                          paddingBottom: "20px",
-                        }}
-                      >
-                        {certifications.map((_, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              width: "8px",
-                              height: "8px",
-                              borderRadius: "50%",
-                              backgroundColor:
-                                index === selectedBook
-                                  ? "rgb(237, 80, 118)"
-                                  : "#555",
-                              transition: "background-color 0.3s ease",
-                            }}
-                          />
-                        ))}
+            {/* Bottom Half - Selected Certificate Details - Desktop only */}
+            {!isMobile && (
+              <div className="certificate-display-section">
+                <div className="certificate-display">
+                  {selectedBook !== null ? (
+                    <div className="selected-certificate">
+                      <div className="cert-header">
+                        <BookOpen
+                          size={24}
+                          style={{ color: "rgb(237, 80, 118)" }}
+                        />
+                        <h4>
+                          {certifications[selectedBook].type === "certification"
+                            ? "Certification Details"
+                            : "Course Details"}
+                        </h4>
+                      </div>
+                      <div className="cert-details">
+                        <h5 className="cert-title-large">
+                          {certifications[selectedBook].title}
+                        </h5>
+                        <p className="cert-issuer-large">
+                          {certifications[selectedBook].issuer}
+                        </p>
                       </div>
                     </div>
+                  ) : (
+                    <div className="no-selection">
+                      <BookOpen
+                        size={48}
+                        style={{ color: "#64748b", opacity: 0.5 }}
+                      />
+                      <p>Click on a book to view certificate details</p>
+                    </div>
+                  )}
+                  {/* Navigation indicator dots */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "8px",
+                      marginTop: "40px",
+                      paddingBottom: "20px",
+                    }}
+                  >
+                    {certifications.map((_, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          width: "8px",
+                          height: "8px",
+                          borderRadius: "50%",
+                          backgroundColor:
+                            index === selectedBook
+                              ? "rgb(237, 80, 118)"
+                              : "#555",
+                          transition: "background-color 0.3s ease",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => setSelectedBook(index)}
+                      />
+                    ))}
                   </div>
-                ) : (
-                  <div className="no-selection">
-                    <BookOpen
-                      size={48}
-                      style={{ color: "#64748b", opacity: 0.5 }}
-                    />
-                    <p>Click on a book to view certificate details</p>
-                  </div>
-                )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Side - Interactive Bookshelf */}
@@ -248,6 +280,89 @@ const Education = () => {
               </div>
             </div>
           </div>
+
+          {/* Mobile Carousel - Mobile only */}
+          {isMobile && (
+            <div className="education-mobile-carousel">
+              <div className="education-carousel-header">
+                <button
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "rgb(237, 80, 118)",
+                    cursor: "pointer",
+                    fontSize: "24px",
+                    padding: "8px",
+                  }}
+                  onClick={prevCertificate}
+                  disabled={certifications.length <= 1}
+                >
+                  <ChevronLeft size={24} />
+                </button>
+
+                <h4 style={{ color: "rgb(237, 80, 118)", margin: 0 }}>
+                  {selectedBook !== null &&
+                  certifications[selectedBook].type === "certification"
+                    ? "Certification"
+                    : "Course"}{" "}
+                  ({selectedBook !== null ? selectedBook + 1 : 1} of{" "}
+                  {certifications.length})
+                </h4>
+
+                <button
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "rgb(237, 80, 118)",
+                    cursor: "pointer",
+                    fontSize: "24px",
+                    padding: "8px",
+                  }}
+                  onClick={nextCertificate}
+                  disabled={certifications.length <= 1}
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+
+              {selectedBook !== null && (
+                <div>
+                  <h5 style={{ color: "white", marginBottom: "0.5rem" }}>
+                    {certifications[selectedBook].title}
+                  </h5>
+                  <p style={{ color: "rgb(237, 80, 118)", fontSize: "0.9rem" }}>
+                    {certifications[selectedBook].issuer}
+                  </p>
+                </div>
+              )}
+              {/* Navigation indicator dots */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "8px",
+                  marginTop: "40px",
+                  paddingBottom: "20px",
+                }}
+              >
+                {certifications.map((_, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      backgroundColor:
+                        index === selectedBook ? "rgb(237, 80, 118)" : "#555",
+                      transition: "background-color 0.3s ease",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setSelectedBook(index)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

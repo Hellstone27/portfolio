@@ -1,14 +1,32 @@
 import { Mail, MapPin, Linkedin, Github } from "lucide-react";
 import { personalInfo } from "../constants/portfolioData";
+import { useState, useEffect } from "react";
 // import useParallax from "../hooks/useParallax";
 
 const Contact = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
   return (
     <section
       id="contact"
       className="contact"
       style={{
-        clipPath: `polygon(
+        clipPath: isMobile
+          ? "none"
+          : `polygon(
           0% 8%, 
           6% 8%, 6% 4%, 
           11% 4%, 11% 9%, 
